@@ -1,62 +1,38 @@
-#ifndef PIDControllerLib
-#define PIDControllerLib
+#pragma once
 
-#if (ARDUINO >= 100)
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
+#ifdef ARDUINO
+#include "Arduino.h"
 #endif
 
-#define GRAPH     "graph"
-#define NOGRAPH   "nograph"
-#define VERBOSE   "verbose"
-#define NOVERBOSE "noverbose"
+class PIDController
+{
+public:
+  double compute(double input);
 
-class PIDController {
-  public:
-    // Constructor
-    PIDController();
+  void tune(double _Kp, double _Ki, double _Kd);
+  void limit(double min, double max);
+  void setpoint(double newSetpoint);
+  void resetLastTime();
+  double getP();
+  double getI();
+  double getD();
+  double getTimeChange();
 
-    // Methods - double
-    double compute(double input, String graph = NOGRAPH, String verbose = NOVERBOSE);
+private:
+  unsigned long lastTime = millis();
+  unsigned long timeChange = 0;
 
-    // Methods - void
-    void begin();
-    void tune(double _Kp, double _Ki, double _Kd);
-    void limit(double min, double max);
-    void setpoint(double newSetpoint);
-    void minimize(double newMinimize);
+  double lastErr = 0;
 
-    // Methods - double, getters
-    double getOutput();
-  private:
-    // Methods
-    void printGraph(double sensorInput, String verbose);
-    
-    // Variables - long
-    unsigned long lastTime;
+  double errSum = 0;
+  double dErr = 0;
 
-    // Variables - double
-    double output;
-    double lastErr;
-    double timeChanged;
+  bool doLimit = false;
 
-    // Variables - double, error variables
-    double error;
-    double errSum;
-    double dErr;
-
-    // Variables - bool
-    bool doLimit;
-    bool init;
-
-    // Variables - double - tuining
-    double Kp;
-    double Ki;
-    double Kd;
-    double divisor;
-    double minOut;
-    double maxOut;
-    double setPoint;
+  double Kp = 1;
+  double Ki = 0;
+  double Kd = 0;
+  double minOut;
+  double maxOut;
+  double setPoint = 0;
 };
-#endif
